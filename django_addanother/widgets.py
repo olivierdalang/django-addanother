@@ -76,16 +76,20 @@ class RelatedWidgetWrapper(WidgetWrapperMixin, forms.Widget):
         edit_params_separator = '&' if (self.edit_related_url and '?' in self.edit_related_url) else '?'
 
         url_params = "%s=%s" % (IS_POPUP_VAR, 1)
+        add_related_url, edit_related_url, edit_related_url_initial = None, None, None
+        if self.add_related_url:
+            add_related_url = self.add_related_url+add_params_separator+url_params
+        if self.edit_related_url:
+            edit_related_url = self.edit_related_url+edit_params_separator+url_params  
+            edit_related_url_initial = None if not value else self.edit_related_url.replace('__fk__',value)+edit_params_separator+url_params
 
         context = {
             'widget': self.widget.render(name, value, *args, **kwargs),
             'name': name,
-            'url_params': url_params,
-            'add_related_url': self.add_related_url,
-            'add_params_separator': mark_safe(add_params_separator),
+            'add_related_url': add_related_url,
             'add_icon': self.add_icon,
-            'edit_related_url': self.edit_related_url,
-            'edit_params_separator': mark_safe(edit_params_separator),
+            'edit_related_url': edit_related_url,
+            'edit_related_url_initial': edit_related_url_initial,
             'edit_icon': self.edit_icon,
         }
         return mark_safe(render_to_string(self.template, context))
